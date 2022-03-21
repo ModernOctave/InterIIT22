@@ -1,191 +1,114 @@
+
 # Installation 
 ## ROS
 You can find these installation instructions [here](http://wiki.ros.org/melodic/Installation/Ubuntu).
-#### Setup your sources.list
-```
-sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
-```
-#### Set up your keys
-```
-sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
-```
-#### Update packages and install ROS
-```
-sudo apt update
-sudo apt install -y ros-melodic-desktop-full
-```
-#### Setup the environment
-```
-echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-source ~/.bashrc
-```
-#### Dependencies
-```
-sudo apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
-```
-#### Rosdep
-```
-sudo apt install -y python-rosdep
-sudo rosdep init
-rosdep update
-```
+
+    sudo apt update
+	sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+	sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+	sudo apt update
+	sudo apt install -y ros-melodic-desktop-full
+	echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
+	source ~/.bashrc
+	sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+	sudo rosdep init
+	rosdep update
 
 ## Ardupilot
 ### Installing Ardupilot and MAVProxy
-#### Clone ArduPilot
-In home directory:
-```
-cd ~
-sudo apt install git
-git clone https://github.com/ArduPilot/ardupilot.git
-cd ardupilot
-git checkout Copter-3.6
-git submodule update --init --recursive
-```
 
-#### Install dependencies:
-```
-sudo apt install python-matplotlib python-serial python-wxgtk3.0 python-wxtools python-lxml python-scipy python-opencv ccache gawk python-pip python-pexpect
-```
+    cd ~
+    sudo apt install -y git
+    git clone https://github.com/ArduPilot/ardupilot.git
+    cd ardupilot
+    git checkout Copter-3.6
+    git submodule update --init --recursive
+    sudo apt install -y python-matplotlib python-serial python-wxgtk3.0 python-wxtools python-lxml python-scipy python-opencv ccache gawk python-pip python-pexpect
+    sudo pip install -y future pymavlink MAVProxy
+    echo 'export PATH=$PATH:$HOME/ardupilot/Tools/autotest' >> ~/.bashrc
+    echo 'export PATH=/usr/lib/ccache:$PATH' >> ~/.bashrc
+    source ~/.bashrc
+    cd ~/ardupilot/ArduCopter
+    sim_vehicle.py -w
 
-#### Use pip (Python package installer) to install mavproxy:
-```
-sudo pip install future pymavlink MAVProxy
-```
-
-Open `~/.bashrc` for editing:
-```
-gedit ~/.bashrc
-```
-
-Add these lines to end of `~/.bashrc` (the file open in the text editor):
-```
-export PATH=$PATH:$HOME/ardupilot/Tools/autotest
-export PATH=/usr/lib/ccache:$PATH
-```
-
-Save and close the text editor.
-
-Reload `~/.bashrc`:
-```
-. ~/.bashrc
-```
-
-Run SITL (Software In The Loop) once to set params:
-```
-cd ~/ardupilot/ArduCopter
-sim_vehicle.py -w
-```
 ## Gazebo and Plugins
 #### Gazebo
 
-Setup your computer to accept software from http://packages.osrfoundation.org:
-```
-sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
-```
+    sudo sh -c 'echo "deb http://packages.osrfoundation.org/gazebo/ubuntu-stable `lsb_release -cs` main" > /etc/apt/sources.list.d/gazebo-stable.list'
+    wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
+    sudo apt update
+    sudo apt install -y gazebo9 libgazebo9-dev
+    sudo apt upgrade libignition-math2
+    
+#### Install Gazebo plugin for APM (ArduPilot Master) :
 
-Setup keys:
-```
-wget http://packages.osrfoundation.org/gazebo.key -O - | sudo apt-key add -
-```
+    cd ~
+    git clone https://github.com/khancyr/ardupilot_gazebo.git
+    cd ardupilot_gazebo
+    git checkout dev
+    mkdir build
+    cd build
+    cmake ..
+    make -j4
+    sudo make install
+    echo 'source /usr/share/gazebo/setup.sh' >> ~/.bashrc
+    echo 'export GAZEBO_MODEL_PATH=~/ardupilot_gazebo/models' >> ~/.bashrc
 
-Reload software list:
-```
-sudo apt update
-```
-Install Gazebo:
-```
-sudo apt install gazebo9 libgazebo9-dev
-```
-### Install Gazebo plugin for APM (ArduPilot Master) :
-```
-cd ~
-git clone https://github.com/khancyr/ardupilot_gazebo.git
-cd ardupilot_gazebo
-git checkout dev
-```
-build and install plugin
-```
-mkdir build
-cd build
-cmake ..
-make -j4
-sudo make install
-```
-```
-echo 'source /usr/share/gazebo/setup.sh' >> ~/.bashrc
-```
-Set paths for models:
-```
-echo 'export GAZEBO_MODEL_PATH=~/ardupilot_gazebo/models' >> ~/.bashrc
-. ~/.bashrc
-```
+#### Install Mavros
 
-## Gazebo models
-```
-cd ~/.gazebo/
-git clone https://github.com/Avi241/models
-cd models 
-sudo rm -r .git
-```
-#### Run Simulator
-In one Terminal (Terminal 1), run Gazebo:
-```
-gazebo --verbose ~/ardupilot_gazebo/worlds/iris_arducopter_runway.world
-```
+    sudo apt-get install -y ros-melodic-mavros
+    wget https://raw.githubusercontent.com/mavlink/mavros/master/mavros/scripts/install_geographiclib_datasets.sh
+    sudo chmod +x install_geographiclib_datasets.sh
+    sudo ./install_geographiclib_datasets.sh
 
-In another Terminal (Terminal 2), run SITL:
-```
-cd ~/ardupilot/ArduCopter/
-sim_vehicle.py -v ArduCopter -f gazebo-iris --console
+## Workspace Setup
+### Creating Catkin Workspace
 
-```
-## If you face gazebo error then Solving Gazebo Error
+    mkdir catkin_ws
+    cd catkin_ws
+    mkdir -p src
+    cd src
+    catkin_init_workspace
+    echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
+    cd ~/catkin_ws
+    catkin_make
+    source ~/catkin_ws/devel/setup.bash
 
-Open ~/.ignition/fuel/config.yaml, replace
-
-api.ignitionfuel.org
-with
-fuel.ignitionrobotics.org
-
-## Creating Catkin Workspace
-
-mkdir catkin_ws
-cd catkin_ws
-mkdir -p src
-cd src
-catkin_init_workspace
-echo "source ~/catkin_ws/devel/setup.bash" >> ~/.bashrc
-cd ~/catkin_ws
-catkin_make
-source ~/catkin_ws/devel/setup.bash
-
-### Compiling package they provided 
-## Download the zip file in your Downloads folder 
-## Open terminal
-
+### Compiling provided package
+Download the provided zip file in your Downloads folder
 ```
 cd ~/Downloads
 unzip InterIIT_DRDO.zip
-cp -r prius_msgs ~/catkin_ws/src/
+mv prius_description interiit22 prius_msgs ~/catkin_ws/src/
 cd ~/catkin_ws
-catkin_make 
-
-cd ~/catkin_ws/src/
-sudo rm -r prius_msgs
-cd  ~/Downloads
-cp -r prius_description interiit22 ~/catkin_ws/src/
-cd ~/catkin_ws
+sed -i '8 a \ \ <build_depend>prius_msgs</build_depend>' src/interiit22/package.xml 
 catkin_make
-
 ``` 
 
-## To run the world
+### Set Model Path
 
-```
-roslaunch interiit22 drdo_world1.launch
+    echo 'export GAZEBO_MODEL_PATH=$HOME/catkin_ws/src/interiit22/models' >> ~/.bashrc
 
-```
+### Compiling our package
+Extract our package in ~/catkin_ws/src/ and then run
 
+    cd ~/catkin_ws
+    catkin_make
 
+### Install dependencies
 
+    cd ~/catkin_ws/MP_DR_T18
+    pip -r requirements.txt
+
+## To the Run Simulation
+Launch the world
+
+    roslaunch MP_DR_T18 drdo_world1.launch
+
+Start Ardupilot SITL
+
+    sim_vehicle.py -v ArduCopter -f gazebo-iris --console
+
+Once SITL provides the 3D fix run the autopilot
+
+    rosrun MP_DR_T18 autopilot.py
