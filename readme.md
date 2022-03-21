@@ -87,7 +87,7 @@ catkin_make
 
 ### Set Model Path
 
-    echo 'export GAZEBO_MODEL_PATH=$HOME/catkin_ws/src/interiit22/models' >> ~/.bashrc
+    echo 'export GAZEBO_MODEL_PATH=$HOME/catkin_ws/src/MP_DR_T18/models' >> ~/.bashrc
 
 ### Compiling our package
 Extract our package in ~/catkin_ws/src/ and then run
