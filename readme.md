@@ -1,27 +1,38 @@
 # Installation 
 ## ROS
-You can find these installation instructions [here](wiki.ros.org/melodic/Installation/Ubuntu).
+You can find these installation instructions [here](http://wiki.ros.org/melodic/Installation/Ubuntu).
 #### Setup your sources.list
+```
 sudo sh -c 'echo "deb http://packages.ros.org/ros/ubuntu $(lsb_release -sc) main" > /etc/apt/sources.list.d/ros-latest.list'
+```
 #### Set up your keys
+```
 sudo apt-key adv --keyserver 'hkp://keyserver.ubuntu.com:80' --recv-key C1CF6E31E6BADE8868B172B4F42ED6FBAB17C654
+```
 #### Update packages and install ROS
+```
 sudo apt update
-sudo apt install ros-melodic-desktop-full
+sudo apt install -y ros-melodic-desktop-full
+```
 #### Setup the environment
+```
 echo "source /opt/ros/melodic/setup.bash" >> ~/.bashrc
-source ~/.bashrc	
+source ~/.bashrc
+```
 #### Dependencies
-sudo apt install python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+```
+sudo apt install -y python-rosdep python-rosinstall python-rosinstall-generator python-wstool build-essential
+```
 #### Rosdep
-sudo apt install python-rosdep
+```
+sudo apt install -y python-rosdep
 sudo rosdep init
 rosdep update
+```
 
 ## Ardupilot
 ### Installing Ardupilot and MAVProxy
 #### Clone ArduPilot
-
 In home directory:
 ```
 cd ~
