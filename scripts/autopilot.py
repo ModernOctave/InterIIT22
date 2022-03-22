@@ -3,7 +3,7 @@
 import rospy
 from camera import camera
 from image_processing import image_processing
-from control import drone_control
+from control import drone_control,car_control
 import cv2 as cv
 from simple_pid import PID
 
@@ -15,6 +15,9 @@ def d2r(deg):
 def follow_road(depth_img):
 	global ip, dc, cam
 	road_angle = ip.get_road_angle(depth_img, cam)
+	# car_x_error,car_y_error = ip.get_car_error(depth_img,cam,True)
+	# print(car_x_error,car_y_error)
+	# cc.publish_control(car_x_error,car_y_error)
 	rospy.loginfo("road angle: "+str(road_angle))
 	rospy.loginfo("road depth: "+str(ip.get_road_depth()))
 	if abs(320-ip.get_road_center()) > 45:
@@ -32,6 +35,7 @@ if __name__ == "__main__":
 	rospy.loginfo("Autopilot node started")
 	ip = image_processing()
 	dc = drone_control()
+	cc = car_control(1,1,1)
 	cam = camera()
 	dc.move_to_destination(0,0,0,0)
 	rospy.sleep(5)
